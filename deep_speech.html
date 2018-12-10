@@ -16,12 +16,11 @@
         color: '#E9967A',
         defaults: {
             name: {value:""},      
-            frequency: {value:0},
-            waveType: {value:"sine"}
+            modelPath: {value:"", required:true}
         },        
         inputs:1,
         outputs:1,
-        icon: "speech.png",
+        icon: "fluid.png",
         label: function() {
             return this.name||"DeepSpeech";
         }
@@ -29,6 +28,11 @@
 </script>
 
 <script type="text/x-red" data-template-name="deep-speech">
+    <div class="form-row">
+        <label for="node-input-modelpath"><i class="fa fa-file-medical-alt"></i> Model path</label>
+        <input type="text" id="node-input-modelpath" placeholder="Specify path">
+    </div>
+    </br>
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -38,4 +42,3 @@
 <script type="text/x-red" data-help-name="deep-speech">
     <p>A Node-RED node to recognize voices using DeepSpeech.</p>
 </script>
-
