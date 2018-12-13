@@ -16,8 +16,10 @@
  module.exports = function(RED) {
     var settings = RED.settings;
     var deepSpeech = require('deepspeech');
-    const argparse = require('argparse');
-    const util = require('util');
+    var Wav = require('node-wav');
+    var Duplex = require('stream').Duplex;
+    var Sox = require('sox-stream');
+    var MemoryStream = require('memory-stream');
     
     function totalTime(hrtimeValue) {
         return parseFloat((hrtimeValue[0] + hrtimeValue[1] / 1000000000).toPrecision(4));
@@ -26,8 +28,6 @@
     function DeepSpeechNode(config) {
         RED.nodes.createNode(this, config);
         this.modelPath = config.modelPath || '/home/pi/node_modules/deepspeech/models';
-        
-        debugger;
  
         var node = this;
         
@@ -78,23 +78,62 @@
         }
         
         node.on("input", function(msg) {
+            var audioStream = new MemoryStream();
+            var stream = new Duplex();
+  
             // Skip all messages until the model has been loaded
             if (!node.model) {
                 return;
             }
             
-          //  debugger;
-          //  var speechAsText = node.model.stt(msg.payload, 16000);
-                      
-          // We take half of the buffer_size because buffer is a char* while
-          // LocalDsSTT() expected a short*
-          /*
-          console.log(model.stt(audioBuffer.slice(0, audioBuffer.length / 2), 16000));
-          const inference_stop = process.hrtime(inference_start);
-          console.error('Inference took %ds for %ds audio file.', totalTime(inference_stop), audioLength.toPrecision(4));
-          */
+            if (!Buffer.isBuffer(msg.payload)) {
+                return;
+            }
+            
+            // The result contains the WAV headers and an array of Float32Arrays (containing the data of all channels)
+            var result = Wav.decode(msg.payload);
+            
+            if (result.sampleRate < 16000) {
+                console.error('Speech sample rate (' + result.sampleRate + ') is lower than 16kHz, so the up-sampling might produce erratic speech recognition.');
+            }
+            
+            debugger;
+            
+            // Convert buffer to a stream
+            stream.push(msg.payload);
+            stream.push(null);
+  
+            // Remark: SOX need to be installed manually (sudo apt-get install sox libsox-fmt-all)
+            stream.pipe(Sox({ 
+                                global: {
+                                    'no-dither': true,
+                                },
+                                output: {
+                                    bits: 16,
+                                    rate: 16000,
+                                    channels: 1,
+                                    encoding: 'signed-integer',
+                                    endian: 'little',
+                                    compression: 0.0,
+                                    type: 'raw'
+                                }
+                            })).pipe(audioStream);
 
-            node.send( {payload:speechAsText} );
+            audioStream.on('finish', () => {
+                debugger;
+                audioBuffer = audioStream.toBuffer();
+                
+                var inference_start = process.hrtime();
+                console.error('Running inference.');
+                var audioLength = (audioBuffer.length / 2) * ( 1 / 16000);
+                  
+                // We take half of the buffer_size because buffer is a char* while LocalDsSTT() expected a short*
+                var speechAsText = node.model.stt(audioBuffer.slice(0, audioBuffer.length / 2), 16000);
+                var inference_stop = process.hrtime(inference_start);
+                console.error('Inference took %ds for %ds audio file.', totalTime(inference_stop), audioLength.toPrecision(4));
+
+                node.send( {payload:speechAsText} );
+            });
         });
     }
 
