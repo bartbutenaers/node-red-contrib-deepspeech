@@ -1,7 +1,7 @@
 # node-red-contrib-deepspeech
 A Node Red node for speech-to-text using Mozilla DeepSpeech.
 
-!!!!!!! THIS IS AN EXPERIMENTAL NODE !!!!!!
+***!!!!!!! THIS IS AN EXPERIMENTAL NODE !!!!!!***
 
 ## Install
 A few (simple!) steps are required to install DeepSpeech:
@@ -20,9 +20,9 @@ A few (simple!) steps are required to install DeepSpeech:
    ```
 
 ## DeepSpeech introduction
-[DeepSpeech](https://github.com/mozilla/DeepSpeech) is an open source Speech-To-Text engine by Mozilla.  The model that is being used, is trained by machine learning techniques.  To enlarge their training set in multiple languages, a [website](https://voice.mozilla.org/nl) has been setup where everybody can help training the system.  So please be my guest ...
+[DeepSpeech](https://github.com/mozilla/DeepSpeech) is an open source Speech-To-Text (STT) engine by Mozilla.  The model that is being used, is trained by machine learning techniques.  To enlarge their training set in multiple languages, a [website](https://voice.mozilla.org/nl) has been setup where everybody can help training the system.  So please be my guest ...
 
-A major advantage of Deepspeech is the ability to run it locally, for users that don't feel comfortable with potential privacy issues when using cloud services (like Google, Amazon, ...).  A major disadvantage of running it local, is the need for lots of system resources.  This will become clear in the test below.
+A major advantage of Deepspeech is the ability to run it locally, in use cases where a cloud service (like Google, Amazon, ...) is not possible or desirable.  A major disadvantage of running it local, is the need for lots of system resources.  This will become clear in the test below.
 
 ## Test results
 Mozilla offers a CLI [client.js](https://github.com/mozilla/DeepSpeech#using-the-nodejs-package) file to test their library on NodeJS.  This node is a similar test in Node-RED, which means their 2830-3980-0043.wav file is analysed:
@@ -49,3 +49,18 @@ Some remarks:
 + Currently the SOX library will convert the audio sample to the required format.  Perhaps this should be put in a separate node...
 + The 2830-3980-0043.wav file has been downloaded from Mozilla's releases [page](https://github.com/mozilla/DeepSpeech/releases/download/v0.3.0/audio-0.3.0.tar.gz).
 + The installation procedure could be simplified, by adding the training data to this repository (so it would be installed automatically).  However it is quite large, and for other languages [extra files](https://github.com/mozilla/DeepSpeech#common-voice-training-data) are needed.
+
+## Hardware
+From the Deepspeech releases [page](https://github.com/mozilla/DeepSpeech/releases), it seems following hardware is currently supported:
++ OS X 10.10, 10.11, 10.12, 10.13 and 10.14
++ Linux x86 64 bit with a modern CPU (Needs at least AVX/FMA)
++ Linux x86 64 bit with a modern CPU + NVIDIA GPU (Compute Capability at least 3.0, see NVIDIA docs)
++ Raspbian Stretch on Raspberry Pi 3
++ ARM64 built against Debian/ARMbian Stretch and tested on LePotato boards
+
+However from the above test, we can conclude the Raspberry Pi 3 is not powerful to support real-time SST conversion.  And the systems with NVIDIA GPU are a quite expensive for lots of hobbyist Node-RED users.  There exist some other dedicated affordable hardware, however that hardware is **not** supported by Deepspeech at the moment.  Some examples:
++ Intel Movidius neural network USB stick: see [issue](https://github.com/mozilla/DeepSpeech/issues/1299).
++ RockPro-64-AI board with artificial-intelligence processor: see [issue](https://github.com/mozilla/DeepSpeech/issues/1346).
+
+## Conclusion
+As soon as Deepspeech can be executed real-time with less system resources, I will continue development on this Node-RED node...
