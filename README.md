@@ -63,4 +63,6 @@ However from the above test, we can conclude the Raspberry Pi 3 is not powerful 
 + RockPro-64-AI board with artificial-intelligence processor: see [issue](https://github.com/mozilla/DeepSpeech/issues/1346).
 
 ## Conclusion
-As soon as Deepspeech can be executed real-time with less system resources, I will continue development on this Node-RED node...
+As soon as Deepspeech can be executed real-time with less system resources, I will continue development on this Node-RED node...  
+
+Questions about this node can be asked on the Node-RED forum, in this [discussion](https://discourse.nodered.org/t/announce-node-red-contrib-deepspeech-test-results/5774).
